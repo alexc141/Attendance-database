@@ -1,42 +1,55 @@
 
-	import java.io.FileOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Scanner;
 
-	import org.apache.poi.hssf.usermodel.HSSFCell;
-	import org.apache.poi.hssf.usermodel.HSSFRow;
-	import org.apache.poi.hssf.usermodel.HSSFSheet;
-	import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-	public class ExcelWriter {
+public class ExcelWriter {
 
-	private static String dest = "CreateExcelDemo.xls";
-	private static HSSFWorkbook myWorkBook = new HSSFWorkbook();
-	private static HSSFSheet mySheet = myWorkBook.createSheet();
-
-	private static void excelLog(int row, int col, String value) {
-	    HSSFRow myRow = mySheet.getRow(row);
-
-	    if (myRow == null)
-	        myRow = mySheet.createRow(row);
-
-	    HSSFCell myCell = myRow.createCell(col);
-	    myCell.setCellValue(value);
-	}
 
 	public static void main(String[] args) {
-	    int numCol = 10; // assume 10 cols
+		String excelFilePath = "CreateExcelDemo.xls";
+		Scanner scan = new Scanner(System.in);
+		try {
+			FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
+			Workbook workbook = WorkbookFactory.create(inputStream);
 
-	    for (int i = 0; i < 10; i++) {
-	        for (int j = 0; j < numCol; j++) {
-	            excelLog(i, j, "Row : " + i + ", Cell : " + j);
-	        }
-	    }
+			Sheet sheet = workbook.getSheetAt(0);
+			
+			
+			for(int i = 0; i<10; i++) {
+				Row rowA = sheet.createRow(i);
+				Cell cellA = rowA.createCell(0);
+				Cell cellB = rowA.createCell(1);
+				cellB.setCellValue(new HSSFRichTextString("[insert ID]"));
+				cellA.setCellValue(new HSSFRichTextString("[insert name]"));
+			}
+			
+			
+			
+			
+			inputStream.close();
 
-	    try {
-	        FileOutputStream out = new FileOutputStream(dest);
-	        myWorkBook.write(out);
-	        out.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+			FileOutputStream outputStream = new FileOutputStream(new File("CreateExcelDemo.xls"));
+			workbook.write(outputStream);
+			workbook.close();
+			outputStream.close();
+			
+		} catch (IOException | EncryptedDocumentException ex) {
+			ex.printStackTrace();
+		}
 	}
-	}
+
+}
